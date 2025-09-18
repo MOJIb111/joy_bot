@@ -3,7 +3,6 @@ import requests
 from base64 import b64decode
 import re
 from datetime import datetime
-import pickle
 import psycopg2
 
 class Picture:

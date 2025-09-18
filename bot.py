@@ -1,6 +1,4 @@
 import asyncio
-from math import lgamma
-
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import psycopg2
@@ -24,10 +22,10 @@ def get_main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="👍 Хорошие"),
-            KeyboardButton(text="🔥 Топ")]
+             KeyboardButton(text="🔥 Топ")],
+            [KeyboardButton(text="🔄 Обновить кэш")]
         ],
-        resize_keyboard=True,
-        input_field_placeholder="Выберите действие..."
+        resize_keyboard=True
     )
     return keyboard
 
@@ -109,7 +107,12 @@ async def handle_good(message: types.Message):
         return
 
     for i in range(min(5, len(pictures))):
-        await message.answer_photo(photo=pictures[i]["img_url"],reply_markup=get_main_keyboard())
+        reply_markup = get_main_keyboard() if i == 4 else None
+        await message.answer_photo(
+            photo=pictures[i]["img_url"],
+            caption=f"⭐ Рейтинг: {pictures[i]['rating']}",
+            reply_markup=reply_markup
+        )
     await asyncio.sleep(0.3)
 
 @dp.message(lambda message: message.text == "🔥 Топ")
@@ -120,8 +123,14 @@ async def handle_best(message: types.Message):
         await message.answer("😔 Нет картинок с рейтингом > 100")
         return
 
-    for i in range(1, len(pictures)):
-        await message.answer_photo(photo=pictures[i]["img_url"], reply_markup=get_main_keyboard())
+    for i in range(min(5, len(pictures))):
+
+        reply_markup = get_main_keyboard() if i == 4 else None
+        await message.answer_photo(
+            photo=pictures[i]["img_url"],
+            caption=f"🔥 Топ! Рейтинг: {pictures[i]['rating']}",
+            reply_markup=reply_markup
+        )
     await asyncio.sleep(0.1)
 
 @dp.message(lambda message: message.text == "Обновить кэш")
@@ -145,12 +154,9 @@ async def handle_help(message: types.Message):
 
 @dp.message()
 async def handle_other_messages(message: types.Message):
-    if message.text not in ["👍 Хорошие", "🔥 Топ"]:
+    if message.text not in ["👍 Хорошие", "🔥 Топ", "🔄 Обновить кэш"]:
         await message.answer(
-            "🤔 Используй кнопки меню или команды:\n"
-            "/start - начать\n"
-            "/menu - показать кнопки\n"
-            "/help - помощь",
+            "🤔 Используй кнопки меню или команды:",
             reply_markup=get_main_keyboard()
         )
 
