@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="245efb24-b92a-4fd4-a8fa-b9497e51eb6e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/postgres_db/postgresdb.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,8 +56,10 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.bot.executor": "Run",
     "Python.cache.executor": "Run",
+    "Python.config.executor": "Run",
     "Python.main.executor": "Run",
     "Python.page_test.executor": "Run",
+    "Python.postgresdb.executor": "Run",
     "Python.test.executor": "Run",
     "Python.test_images.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",

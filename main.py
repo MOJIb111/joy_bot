@@ -3,64 +3,10 @@ import requests
 from base64 import b64decode
 import re
 from datetime import datetime
-import psycopg2
-
-class Picture:
-    def __init__(self, img, rating, date):
-        self.img = img
-        self.rating = rating
-        self.date = date
-
-def create_table():
-    time.sleep(5)
-    conn = psycopg2.connect(
-        dbname = 'joyreactor_data',
-        user = 'saitama',
-        password = 'hungry',
-        host = 'postgres',
-        port = '5432'
-    )
-
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS pictures(
-        id SERIAL PRIMARY KEY,
-        img_url TEXT NOT NULL UNIQUE,
-        rating INTEGER NOT NULL,
-        date TEXT NOT NULL, 
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """)
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-    print("✅  Таблица создана")
-
-def save_to_db(pictures):
-    try:
-        conn = psycopg2.connect(
-            dbname='joyreactor_data',
-            user='saitama',
-            password='hungry',
-            host='postgres',
-            port='5432'
-        )
-        cursor = conn.cursor()
-        for picture in pictures:
-            cursor.execute(
-                "INSERT INTO pictures(img_url, rating, date) VALUES (%s, %s, %s) ON CONFLICT (img_url) DO NOTHING",
-                (picture.img, picture.rating, picture.date)
-            )
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"✅Сохранено: {len(pictures)} изображений")
-    except Exception as e:
-        print(f"❌Ошибка сохранения: {e}")
+from postgres_db.postgresdb import repository
 
 def get_data():
-    create_table()
+    repository.create_table()
     pictures = []
     page = 318
     while page >= 200:
@@ -105,7 +51,6 @@ def get_data():
 
 
         response = requests.post('https://api.joyreactor.cc/graphql', cookies=cookies, headers=headers, json=json_data)
-
         data = response.json()
         posts = data["data"]["tag"]["postPager"]["posts"]
 
@@ -132,20 +77,18 @@ def get_data():
                     img_url = f"https://img2.joyreactor.cc/pics/post/full/-{img_tag}-{img_id}.{img_type}"
                     rating = post["rating"]
                     dt = post["createdAt"]
-                    date = datetime.fromisoformat(dt)
-                    date = date.strftime("%d.%m.%y-%H:%M")
+                    date = datetime.fromisoformat(dt).strftime("%d.%m.%y-%H:%M")
 
-
-                    picture = Picture(img=img_url,
-                                      rating=rating,
-                                      date=date)
-                    pictures.append(picture)
-
-                    time.sleep(2)
+                    picture_data = {
+                        "img_url" : img_url,
+                        "rating" : rating,
+                        "date" : date
+                    }
+                    pictures.append(picture_data)
 
         page -= 1
-
-    save_to_db(pictures)
+        time.sleep(1)
+        repository.save_to_db(pictures)
     return pictures
 
 

@@ -1,20 +1,14 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-import psycopg2
+from postgres_db.postgresdb import repository
+from config import config
 from aiogram.filters import Command
-from settings import BOT_TOKEN
 from cache import cache
 
-DB_CONFIG = {
-    'dbname': 'joyreactor_data',
-    'user': 'saitama',
-    'password': 'hungry',
-    'host': 'postgres',
-    'port': '5432'
-}
+config.DB_CONFIG()
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(config.BOT_TOKEN)
 
 dp = Dispatcher()
 
@@ -30,61 +24,16 @@ def get_main_keyboard():
     return keyboard
 
 def get_good_pictures():
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor()
+        repository.get_good_pictures()
 
-        cursor.execute(
-            """
-            SELECT img_url, rating
-            FROM pictures
-            ORDER BY rating DESC        
-            """)
-
-        results = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        pictures = []
-        for result in results:
-            pictures.append(
-                {"img_url" : result[0],
-                 "rating" : result[1]}
-            )
-        return pictures
-    except Exception as e:
-        print(f"Ошибка базы данных: {e}")
 
 def get_best_pictures():
-    try:
         cached_data = cache.get("best_pictures")
         if cached_data:
             return cached_data
+        repository.get_best_pictures()
+        cache.set("best_pictures", repository.get_best_pictures())
 
-        conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            SELECT img_url, rating
-            FROM pictures
-            WHERE rating > 100
-            """)
-        results =  cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        pictures = []
-        for result in results:
-            pictures.append({
-                "img_url" : result[0],
-                "rating" : result[1]
-            })
-        cache.set("best_pictures", pictures)
-        return pictures
-    except Exception as e:
-        print(f"Ошибка базы данных {e}")
-        return []
 @dp.message(Command("start"))
 async def handle_start(message: types.Message):
     welcome_text = """
@@ -162,7 +111,7 @@ async def handle_other_messages(message: types.Message):
 
 async def main():
     print("🤖 Бот запущен! Ожидаю сообщения...")
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, skip_updates=True)
 
 if __name__ == "__main__":
     asyncio.run(main())

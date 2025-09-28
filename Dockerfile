@@ -17,5 +17,5 @@ COPY . .
 RUN useradd -m -u 1000 user
 USER user
 
-CMD ["python", "main.py"]
+CMD ["python", "bot.py"]
 
