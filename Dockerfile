@@ -14,6 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN mkdir -p /app/logs && chmod 755 /app/logs
+
 RUN useradd -m -u 1000 user
 USER user
 
