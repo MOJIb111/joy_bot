@@ -50,7 +50,7 @@ class Repository:
 
     def get_best_pictures(self):
         db = self.SessionLocal()
-        pictures = db.query(Picture).filter(Picture.rating > 100).order_by(Picture.rating.desc()).all()
+        pictures = db.query(Picture).filter(Picture.rating > 150).order_by(Picture.rating.desc()).all()
         db.close()
         return [{"img_url": p.img_url, "rating": p.rating} for p in pictures]
 
