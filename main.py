@@ -64,12 +64,12 @@ def get_data():
 
                     img_id = b64decode(post["attributes"][0]["id"])[-7:].decode("utf-8")
                     img_type = post["attributes"][0]["image"]["type"].lower()
-                    vowels = r"[!@#$%^&*? ]"
+                    regulars = r"[!@#$%^&*? ]"
 
                     tags = []
                     for i in range(len(post["tags"])):
                         tag_name = post["tags"][i]["mainTag"]["name"]
-                        cleaned_tag = re.sub(vowels, "-", tag_name)
+                        cleaned_tag = re.sub(regulars, "-", tag_name)
                         tags.append(cleaned_tag)
 
                     img_tag = "-".join(tags)
